@@ -1,98 +1,92 @@
--- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
---
--- Host: 127.0.0.1    Database: dannydiner
--- ------------------------------------------------------
--- Server version	8.0.43
+CREATE DATABASE retailsales;
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+USE retailsales;
 
---
--- Table structure for table `members`
---
 
-DROP TABLE IF EXISTS `members`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `members` (
-  `customer_id` text,
-  `join_date` text
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+SELECT * FROM retail_sales_dataset;
 
---
--- Dumping data for table `members`
---
+-- How many sales we have?
+SELECT COUNT(*) as total_sale 
+FROM retail_sales_dataset
 
-LOCK TABLES `members` WRITE;
-/*!40000 ALTER TABLE `members` DISABLE KEYS */;
-INSERT INTO `members` VALUES ('A','2021-01-07'),('B','2021-01-09');
-/*!40000 ALTER TABLE `members` ENABLE KEYS */;
-UNLOCK TABLES;
+-- How many uniuque customers we have ?
+SELECT COUNT(DISTINCT customer_id) as unique_customers 
+FROM retail_sales_dataset
 
---
--- Table structure for table `menu`
---
 
-DROP TABLE IF EXISTS `menu`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `menu` (
-  `product_id` int DEFAULT NULL,
-  `product_name` text,
-  `price` int DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+-- Data Analysis & Business Key Problems & Answers
 
---
--- Dumping data for table `menu`
---
+-- Q.1 Write a SQL query to retrieve all columns for sales made on '2022-11-05
+SELECT *
+FROM retail_sales_dataset
+WHERE sale_date = '2022-11-05';
 
-LOCK TABLES `menu` WRITE;
-/*!40000 ALTER TABLE `menu` DISABLE KEYS */;
-INSERT INTO `menu` VALUES (1,'sushi',10),(2,'curry',15),(3,'ramen',12);
-/*!40000 ALTER TABLE `menu` ENABLE KEYS */;
-UNLOCK TABLES;
 
---
--- Table structure for table `sales`
---
+-- Q.2 Write a SQL query to retrieve all transactions where the category is 'Clothing' and the quantity sold is more than 4 in the month of Nov-2022
+SELECT * 
+FROM retail_sales_dataset
+WHERE category = 'Clothing' 
+AND DATE_FORMAT(sale_date, '%Y-%m') = '2022-11' 
+AND quantiy >= 4;
 
-DROP TABLE IF EXISTS `sales`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `sales` (
-  `customer_id` text,
-  `order_date` text,
-  `product_id` int DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `sales`
---
 
-LOCK TABLES `sales` WRITE;
-/*!40000 ALTER TABLE `sales` DISABLE KEYS */;
-INSERT INTO `sales` VALUES ('A','2021-01-01',1),('A','2021-01-01',2),('A','2021-01-07',2),('A','2021-01-10',3),('A','2021-01-11',3),('A','2021-01-11',3),('B','2021-01-01',2),('B','2021-01-02',2),('B','2021-01-04',1),('B','2021-01-11',1),('B','2021-01-16',3),('B','2021-02-01',3),('C','2021-01-01',3),('C','2021-01-01',3),('C','2021-01-07',3);
-/*!40000 ALTER TABLE `sales` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+-- Q.3 Write a SQL query to calculate the total sales (total_sale) for each category.
+SELECT category, SUM(total_sale) AS net_sale, COUNT(*) AS total_orders
+FROM retail_sales_dataset
+GROUP BY 1;
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-08-25  9:53:35
+-- Q.4 Write a SQL query to find the average age of customers who purchased items from the 'Beauty' category.
+SELECT ROUND(AVG(age)) AS avg_age
+FROM retail_sales_dataset
+WHERE category = 'Beauty'
+
+
+
+-- Q.5 Write a SQL query to find all transactions where the total_sale is greater than 1000.
+SELECT *
+FROM retail_sales_dataset
+WHERE total_sale > 1000;
+
+
+-- Q.6 Write a SQL query to find the total number of transactions (transaction_id) made by each gender in each category.
+SELECT category, gender, COUNT(*) AS total_trans
+FROM retail_sales_dataset 
+GROUP BY category, gender 
+ORDER BY 1
+
+
+-- Q.7 Write a SQL query to calculate the average sale for each month. Find out best selling month in each year
+SELECT 
+    year,
+    month,
+    avg_sale
+FROM 
+(    
+    SELECT 
+        EXTRACT(YEAR FROM sale_date) as year,
+        EXTRACT(MONTH FROM sale_date) as month,
+        AVG(total_sale) as avg_sale,
+        RANK() OVER(PARTITION BY EXTRACT(YEAR FROM sale_date) ORDER BY AVG(total_sale) DESC) as `rank`
+    FROM retail_sales_dataset
+    GROUP BY year, month
+) as t1
+WHERE `rank` = 1;
+
+
+-- Q.8 Write a SQL query to find the top 5 customers based on the highest total sales 
+SELECT customer_id, SUM(total_sale) AS total_sales
+FROM retail_sales_dataset
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 5 
+
+
+-- Q.9 Write a SQL query to find the number of unique customers who purchased items from each category.
+SELECT category, COUNT(DISTINCT customer_id) AS count_unique
+FROM retail_sales_dataset
+GROUP BY category
+
+
+
